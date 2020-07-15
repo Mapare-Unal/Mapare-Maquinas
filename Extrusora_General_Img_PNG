@@ -1,0 +1,22 @@
+Parameter.UpdateAfterChange = True
+InventorVb.DocumentUpdate()
+
+strFolder = "C:\Users\Familia\Desktop\" & ThisDoc.FileName(False) 'Coloca la direccion del donde se guarda.
+
+'Condicional para cada una de los tamaños de las maquinas 
+If scalaX = 400 Then	
+'Set the PDF target file name
+ThisDoc.Document.SaveAs(strFolder & ("_Grande.png"), True)
+'ThisDoc.Document.SaveAs(strFolder & (" mediana.pdf"), True) 'Tambien se puede que la imagen salga en un pdf por si se desea
+ 
+ElseIf scalaX = 200 Then
+'Set the PDF target file name
+ThisDoc.Document.SaveAs(strFolder & ("_Mediana.png"), True)
+'ThisDoc.Document.SaveAs(strFolder & (" mediana.pdf"), True)
+
+ElseIf scalaX = 50 Then
+'Set the PDF target file name
+ThisDoc.Document.SaveAs(strFolder & ("_Pequeña.png"), True)
+'ThisDoc.Document.SaveAs(strFolder & (" mediana.pdf"), True)
+
+End If

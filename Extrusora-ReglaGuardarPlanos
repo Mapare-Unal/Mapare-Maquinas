@@ -1,0 +1,63 @@
+Parameter.UpdateAfterChange = True
+	InventorVb.DocumentUpdate()
+
+	
+	oPath = ThisDoc.Path
+	oFileName = ThisDoc.FileName(False) 'without extension
+	oRevNum = iProperties.Value("project", "revision number")
+	oPDFAddIn = ThisApplication.ApplicationAddIns.ItemById _
+		("{0AC6FD96-2F4D-42CE-8BE0-8AEA580399E4}")
+oDocument = ThisApplication.ActiveDocument
+oContext = ThisApplication.TransientObjects.CreateTranslationContext
+oContext.Type = IOMechanismEnum.kFileBrowseIOMechanism
+oOptions = ThisApplication.TransientObjects.CreateNameValueMap
+oDataMedium = ThisApplication.TransientObjects.CreateDataMedium 
+
+
+If oPDFAddIn.HasSaveCopyAsOptions(oDocument, oContext, oOptions) Then
+oOptions.Value("All_Color_AS_Black") = 0
+oOptions.Value("Remove_Line_Weights") = 1
+oOptions.Value("Vector_Resolution") = 400
+oOptions.Value("Sheet_Range") = Inventor.PrintRangeEnum.kPrintAllSheets
+'oOptions.Value("Custom_Begin_Sheet") = 2'oOptions.Value("Custom_End_Sheet") = 4
+End If 
+
+
+'get PDF target folder path
+oFolder = "D:\Docuemetos escritorio\Videos clases\Computacion\Proyecto Final extrusora\Planos\"  'En esta parte coloca la ruta donde desea guardar los archivos
+'instead Of ""
+
+
+'Check for the PDF folder and create it if it does not exist
+If Not System.IO.Directory.Exists(oFolder) Then
+    System.IO.Directory.CreateDirectory(oFolder)
+End If
+
+
+'Condicional para cada una de los tamaños de las maquinas 
+If Parameter("Extruder.iam.scalaX") = 400 Then	
+	
+	 'Set the PDF target file name
+oDataMedium.FileName = oFolder & "\" & oFileName & _
+"_Máquina_grande" & oRevNum & ".pdf"  'Coloca el nombre de como se guardara el archivo.
+
+
+ElseIf Parameter("Extruder.iam.scalaX") = 200 Then
+	
+ 'Set the PDF target file name
+oDataMedium.FileName = oFolder & "\" & oFileName & _
+"_Máquina_mediana" & oRevNum & ".pdf" 
+
+	
+
+ElseIf Parameter("Extruder.iam.scalaX") = 50 Then
+ 'Set the PDF target file name
+oDataMedium.FileName = oFolder & "\" & oFileName & _
+"_Máquina_pequeña" & oRevNum & ".pdf" 
+
+
+End If
+
+'Publish document
+oPDFAddIn.SaveCopyAs(oDocument, oContext, oOptions, oDataMedium) 
+'------end of iLogic-------

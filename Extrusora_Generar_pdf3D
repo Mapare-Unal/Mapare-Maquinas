@@ -1,0 +1,85 @@
+'Get the 3D PDF Add-In. - 
+	'Obtenga el complemento PDF 3D.
+	Dim oPDFAddIn As ApplicationAddIn
+	Dim oAddin As ApplicationAddIn
+	For Each oAddin In ThisApplication.ApplicationAddIns
+		If oAddin.ClassIdString = "{3EE52B28-D6E0-4EA4-8AA6-C2A266DEBB88}" Then
+			oPDFAddIn = oAddin
+			Exit For
+		End If
+	Next
+
+	If oPDFAddIn Is Nothing Then
+		MsgBox("Inventor 3D PDF Addin not loaded.")
+		Exit Sub
+	End If
+
+	Dim oPDFConvertor3D = oPDFAddIn.Automation
+
+	'Set a reference to the active document (the document to be published) 
+	'Establecer una referencia al documento activo (el documento que se publicará).
+	Dim oDocument As Document = ThisApplication.ActiveEditDocument
+
+	' Create a NameValueMap objectfor all options..
+	'Crear un objeto NameValueMap para todas las opciones ...
+	Dim oOptions As NameValueMap = ThisApplication.TransientObjects.CreateNameValueMap
+	Dim STEPFileOptions As NameValueMap = ThisApplication.TransientObjects.CreateNameValueMap
+
+	' Export file name and location...
+	' Exportar nombre y ubicación del archivo 
+	'Condicional para cada una de los tamaños de las maquinas 
+If scalaX = 400 Then	
+'Set the PDF target file name
+oOptions.Value("FileOutputLocation") = "D:\Docuemetos escritorio\Videos clases\Computacion\Proyecto Final extrusora\Planos\Extrusora_Grande3D.pdf"
+	'En la linea de arriba modificar la dirección y nombre con el cual se va guardar 
+
+ElseIf scalaX = 200 Then
+'Set the PDF target file name
+oOptions.Value("FileOutputLocation") = "D:\Docuemetos escritorio\Videos clases\Computacion\Proyecto Final extrusora\Planos\Extrusora_Median3D.pdf"
+	'En la linea de arriba modificar la dirección y nombre con el cual se va guardar 
+
+ElseIf scalaX = 50 Then
+'Set the PDF target file name
+oOptions.Value("FileOutputLocation") = "D:\Docuemetos escritorio\Videos clases\Computacion\Proyecto Final extrusora\Planos\Extrusora_Pequeña3D.pdf"
+	'En la linea de arriba modificar la dirección y nombre con el cual se va guardar 
+End If
+	
+	
+	
+	
+	'Open the 3D PDF when export is complete? 
+	'¿Abrir el PDF 3D cuando se completa la exportación?
+	'oOptions.Value("ViewPDFWhenFinished") = True
+
+	' Define a file to attach to the exported 3D PDF - note here I have picked an Excel spreadsheet
+	' You need to use the full path and filename - if it does not exist the file will not be attached.
+	'Definir un archivo para adjuntar al PDF 3D exportado - tenga en cuenta aquí que he elegido una hoja de cálculo Excel
+	'Debe usar la ruta completa y el nombre de archivo; si no existe, el archivo no se adjuntará.
+
+	'Dim oAttachedFiles As String() = {"C:\FileToAttach.xlsx"}
+	'oOptions.Value("AttachedFiles") = oAttachedFiles
+
+
+
+    ' Export all properties?
+	'¿Exportar todas las propiedades?
+    oOptions.Value("ExportAllProperties") = True
+	
+	' Choose the export template based off the current document type
+	'Elija la plantilla de exportación basada en el tipo de documento actual
+    If oDocument.DocumentType = DocumentTypeEnum.kPartDocumentObject Then
+        oOptions.Value("ExportTemplate") = "C:\Users\Public\Documents\Autodesk\Inventor 2019\Templates\Sample Part Template.pdf"
+    Else									'Si es inventor 2020 solo cambiar a \Inventor 2020\	 lo demás dejarlo igual.
+        oOptions.Value("ExportTemplate") = "C:\Users\Public\Documents\Autodesk\Inventor 2019\Templates\Sample Assembly Template.pdf"
+    End If
+	
+	
+	' Set the design view(s) to export - note here I am exporting only the active design view (view representation)
+	'Establecer la (s) vista (s) de diseño para exportar - tenga en cuenta que aquí solo estoy exportando la vista de diseño activa (representación de vista)
+    Dim sDesignViews(0) As String
+    sDesignViews(0) = oDocument.ComponentDefinition.RepresentationsManager.ActiveDesignViewRepresentation.Name
+    oOptions.Value("ExportDesignViewRepresentations") = sDesignViews
+	
+	'Publish document.
+	'Publicar documento.
+   Call oPDFConvertor3D.Publish(oDocument, oOptions)
